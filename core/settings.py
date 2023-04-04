@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # 3rd Party
     "phonenumber_field",
     "django_extensions",
+    "rest_framework",
 ]
 
 REST_FRAMEWORK = {

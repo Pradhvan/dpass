@@ -1,11 +1,12 @@
+from django.conf import settings
 from django.db import models
 
 from accounts.model_mixins import AddressModelMixin
 
 
-class BankAddress(AddressModelMixin):
+class Address(AddressModelMixin):
     class Meta:
-        verbose_name = "Bank Address"
+        verbose_name = "Address"
 
 
 class Bank(models.Model):
@@ -22,22 +23,40 @@ class Bank(models.Model):
     name = models.CharField(max_length=100)
     bank_type = models.CharField("type", choices=BankType.choices, max_length=20)
     bic = models.CharField(max_length=7)
-    head_office_address = models.ForeignKey(
-        BankAddress, on_delete=models.CASCADE, related_name="head_office_address"
-    )
+    head_office_address = models.ForeignKey(Address, on_delete=models.CASCADE)
 
-
-class Account(models.Model):
-    ...
-
-
-class Transaction(models.Model):
-    ...
+    def __str__(self):
+        return self.name
 
 
 class Branch(models.Model):
-    ...
+    name = models.CharField(max_length=500)
+    branch_address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    ifsc = models.CharField(max_length=15)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
 
 
-class AccountType(models.Model):
-    ...
+class Account(models.Model):
+    class AccountType(models.TextChoices):
+        SAVING = "Savings Account"
+        CURRENT = "Current Account"
+        SALARY = "Salary Account"
+        NRI = "NRI Account"
+        RD = "Recurring Deposit Account"
+        FD = "Fixed Deposit Accounts"
+
+    balance = models.DecimalField(max_digits=6, decimal_places=2)
+    account_type = models.CharField(
+        "type",
+        choices=AccountType.choices,
+        max_length=30,
+    )
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    account_number = models.IntegerField()
+
+
+class Transaction(models.Model):
+    ammount = models.DecimalField(max_digits=6, decimal_places=2)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    transaction_id = models.CharField(max_length=22)
