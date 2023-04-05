@@ -44,11 +44,18 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "django_extensions",
     "rest_framework",
+    "corsheaders",
+    "rest_framework_simplejwt",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # Only added it just so I use the feature of browsable API
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
     ],
 }
 
@@ -66,6 +73,8 @@ CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
     "http://localhost:8000",
 )
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 
 ROOT_URLCONF = "core.urls"
 
