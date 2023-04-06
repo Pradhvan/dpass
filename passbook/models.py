@@ -28,15 +28,15 @@ class Bank(models.Model):
         SFB = ("Small Finance Banks",)
         PB = ("Payments Banks",)
 
-    name = models.CharField(max_length=100)
+    bank_name = models.CharField(max_length=100)
     bank_type = models.CharField("type", choices=BankType.choices, max_length=20)
     bic = models.CharField(max_length=7)
     head_office_address = models.OneToOneField(
-        Address, on_delete=models.CASCADE, related_name="bank_head_office_address"
+        Address, on_delete=models.CASCADE, related_name="head_office_address"
     )
 
     def __str__(self):
-        return self.name
+        return self.bank_name
 
 
 class Branch(models.Model):
@@ -44,15 +44,15 @@ class Branch(models.Model):
         verbose_name = "Branch"
         verbose_name_plural = "Branches"
 
-    name = models.CharField(max_length=500)
+    branch_name = models.CharField(max_length=500)
     ifsc = models.CharField(max_length=15)
-    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name="bank")
     address = models.OneToOneField(
-        Address, on_delete=models.CASCADE, related_name="branch_address"
+        Address, on_delete=models.CASCADE, related_name="address"
     )
 
     def __str__(self):
-        return self.name
+        return self.branch_name
 
 
 class Account(TimeStampModel):
@@ -104,7 +104,7 @@ class Account(TimeStampModel):
         return str(self.account_number)
 
 
-class Action(TimeStampModel):
+class Action(models.Model):
     class Meta:
         verbose_name = "Account Action"
         verbose_name_plural = "Account Actions"
@@ -137,6 +137,7 @@ class Action(TimeStampModel):
         editable=False,
         max_length=30,
     )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -161,6 +162,7 @@ class Action(TimeStampModel):
         choices=REFERENCE_TYPE_CHOICES,
         default=REFERENCE_TYPE_NONE,
     )
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.type
