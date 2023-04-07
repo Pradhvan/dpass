@@ -16,7 +16,7 @@ class BankList(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
     def get(self, request, format=None):
-        banks = [bank.name for bank in Bank.objects.all()]
+        banks = Bank.objects.all()
         serializer = BankSerializer(banks, many=True)
         return Response(serializer.data)
 
