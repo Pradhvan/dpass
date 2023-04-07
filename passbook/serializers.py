@@ -1,6 +1,17 @@
 from rest_framework import serializers
 
-from .models import Account, Action, Bank, Branch
+from .models import Account, Action, Address, Bank, Branch
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            "address1",
+            "address2",
+            "pin_code",
+            "city",
+        )
+        model = Address
 
 
 class BankSerializer(serializers.ModelSerializer):
@@ -22,6 +33,14 @@ class BranchSerializer(serializers.ModelSerializer):
             "bank",
             "address",
         )
+        model = Branch
+
+
+class BranchListSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+
+    class Meta:
+        fields = ("branch_name", "ifsc", "address")
         model = Branch
 
 

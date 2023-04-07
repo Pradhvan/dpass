@@ -8,6 +8,7 @@ from .serializers import (
     AccountSerializer,
     ActionSerializer,
     BankSerializer,
+    BranchListSerializer,
     BranchSerializer,
 )
 
@@ -21,11 +22,11 @@ class BankList(APIView):
         return Response(serializer.data)
 
 
-class BranchList(generics.ListCreateAPIView):
+class BranchList(generics.ListAPIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
     queryset = Branch.objects.all()
-    serializer_class = BranchSerializer
+    serializer_class = BranchListSerializer
 
 
 class LastTenActionList(APIView):
