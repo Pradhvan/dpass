@@ -18,7 +18,7 @@ from .serializers import (
 class BankList(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
-    def get(self):
+    def get(self, request):
         banks = Bank.objects.all()
         serializer = BankSerializer(banks, many=True)
         return Response(serializer.data)
