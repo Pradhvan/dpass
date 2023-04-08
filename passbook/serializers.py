@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from taggit.serializers import TaggitSerializer, TagListSerializerField
 
 from .models import Account, Action, Address, Bank, Branch
 
@@ -44,7 +45,9 @@ class BranchListSerializer(serializers.ModelSerializer):
         model = Branch
 
 
-class ActionSerializer(serializers.ModelSerializer):
+class ActionSerializer(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+
     def to_representation(self, instance):
         representation = super(ActionSerializer, self).to_representation(instance)
         representation["created"] = instance.created.strftime("%Y-%m-%d %H:%M:%S")
@@ -58,6 +61,7 @@ class ActionSerializer(serializers.ModelSerializer):
             "reference_type",
             "reference",
             "created",
+            "tags",
         )
         model = Action
 

@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from taggit.managers import TaggableManager
 
 from accounts.model_mixins import AddressModelMixin
 from core.models import TimeStampModel
@@ -163,6 +164,7 @@ class Action(models.Model):
         default=REFERENCE_TYPE_NONE,
     )
     created = models.DateTimeField()
+    tags = TaggableManager()
 
     def __str__(self):
         return self.type

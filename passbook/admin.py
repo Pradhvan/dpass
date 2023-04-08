@@ -18,7 +18,14 @@ class ActionAdmin(admin.ModelAdmin):
         "delta",
         "created",
         "reference_type",
+        "tag_list",
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("tags")
+
+    def tag_list(self, obj):
+        return ", ".join(o.name for o in obj.tags.all())
 
 
 admin.site.register(Action, ActionAdmin)
