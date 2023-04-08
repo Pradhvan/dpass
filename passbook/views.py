@@ -1,5 +1,6 @@
 import datetime
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,7 +49,17 @@ class LastTenActionList(APIView):
         return Response(serializer.data)
 
 
-class ActionList(APIView):
+class ActionList(generics.ListAPIView):
+    permission_classes = (IsAuthorOrReadOnly,)
+    queryset = Action.objects.all()
+    serializer_class = ActionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = [
+        "user_friendly_id",
+    ]
+
+
+class ActionDateFilter(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
     def post(self, request):
