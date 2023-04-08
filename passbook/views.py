@@ -11,7 +11,6 @@ from .serializers import (
     AccountSerializer,
     ActionSerializer,
     BankSerializer,
-    BranchListSerializer,
     BranchSerializer,
 )
 
@@ -19,7 +18,7 @@ from .serializers import (
 class BankList(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
-    def get(self, request, format=None):
+    def get(self):
         banks = Bank.objects.all()
         serializer = BankSerializer(banks, many=True)
         return Response(serializer.data)
@@ -27,9 +26,12 @@ class BankList(APIView):
 
 class BranchList(generics.ListAPIView):
     permission_classes = (IsAuthorOrReadOnly,)
-
+    serializer_class = BranchSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = [
+        "ifsc",
+    ]
     queryset = Branch.objects.all()
-    serializer_class = BranchListSerializer
 
 
 class LastTenActionList(APIView):
@@ -37,7 +39,7 @@ class LastTenActionList(APIView):
 
     def get(self, request):
         # select * from passbook_action order by passbook_action.created desc limit 10;
-        actions = Action.objects.order_by("-created")[:10]
+        actions = Action.objects.filter(user=request.user).order_by("-created")[:10]
         # By setting many=True you tell drf that queryset contains mutiple items.
         # If it's not set it might map id feild or some other feild from query set
         # to serializers feild that might give error like
@@ -51,45 +53,45 @@ class LastTenActionList(APIView):
 
 class ActionList(generics.ListAPIView):
     permission_classes = (IsAuthorOrReadOnly,)
-    queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = [
         "user_friendly_id",
     ]
 
+    def get_queryset(self):
+        current_user = self.request.user
+        return Action.objects.filter(user=current_user)
+
 
 class ActionDateFilter(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
+    def get(self, request):
+        current_user = request.user
+        actions = Action.objects.filter(
+            user=current_user, created__gte=datetime.date.today()
+        )
+        serializer = ActionSerializer(actions, many=True)
+        return Response(serializer.data)
+
     def post(self, request):
-        print(request.data)
         data = request.data
         start_date = datetime.datetime.strptime(data.get("start_date"), "%Y-%m-%d")
         end_date = datetime.datetime.strptime(data.get("end_date"), "%Y-%m-%d")
         actions = Action.objects.filter(
             created__gt=start_date,
             created__lt=end_date,
+            user=request.user,
         )
         serializer = ActionSerializer(actions, many=True)
         return Response(serializer.data)
 
 
-class FechBranchInfo(APIView):
+class FetchBalance(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
 
-    def post(self, request):
-        data = request.data
-        branch = Branch.objects.filter(ifsc=data.get("ifsc")).values()
-        serializer = BranchSerializer(branch, many=True)
-        return Response(serializer.data)
-
-
-class FechAccountInfo(APIView):
-    permission_classes = (IsAuthorOrReadOnly,)
-
-    def post(self, request):
-        data = request.data
-        account = Account.objects.filter(**data).values()
+    def get(self, request):
+        account = Account.objects.filter(user=request.user).values()
         serializer = AccountSerializer(account, many=True)
         return Response(serializer.data)

@@ -16,6 +16,8 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class BankSerializer(serializers.ModelSerializer):
+    head_office_address = AddressSerializer()
+
     class Meta:
         fields = (
             "bank_name",
@@ -27,21 +29,14 @@ class BankSerializer(serializers.ModelSerializer):
 
 
 class BranchSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+
     class Meta:
         fields = (
             "branch_name",
             "ifsc",
-            "bank",
             "address",
         )
-        model = Branch
-
-
-class BranchListSerializer(serializers.ModelSerializer):
-    address = AddressSerializer()
-
-    class Meta:
-        fields = ("branch_name", "ifsc", "address")
         model = Branch
 
 

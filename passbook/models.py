@@ -97,7 +97,7 @@ class Account(TimeStampModel):
         verbose_name="Public identifier",
     )
 
-    branch = models.OneToOneField(Branch, on_delete=models.PROTECT)
+    branch = models.ForeignKey(Branch, on_delete=models.PROTECT)
     account_number = models.IntegerField()
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
