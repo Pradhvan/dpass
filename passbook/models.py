@@ -134,7 +134,7 @@ class Action(models.Model):
     )
     user_friendly_id = models.CharField(
         unique=True,
-        editable=False,
+        editable=True,
         max_length=30,
     )
 
@@ -162,7 +162,7 @@ class Action(models.Model):
         choices=REFERENCE_TYPE_CHOICES,
         default=REFERENCE_TYPE_NONE,
     )
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField()
 
     def __str__(self):
         return self.type

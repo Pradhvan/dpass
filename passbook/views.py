@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -42,6 +44,22 @@ class LastTenActionList(APIView):
         # The serializer field might be named incorrectly and not match any attribute or key on the `QuerySet` instance.
         # Original exception text was: 'QuerySet' object has no attribute 'branch_name'.
 
+        serializer = ActionSerializer(actions, many=True)
+        return Response(serializer.data)
+
+
+class ActionList(APIView):
+    permission_classes = (IsAuthorOrReadOnly,)
+
+    def post(self, request):
+        print(request.data)
+        data = request.data
+        start_date = datetime.datetime.strptime(data.get("start_date"), "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(data.get("end_date"), "%Y-%m-%d")
+        actions = Action.objects.filter(
+            created__gt=start_date,
+            created__lt=end_date,
+        )
         serializer = ActionSerializer(actions, many=True)
         return Response(serializer.data)
 

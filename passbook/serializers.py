@@ -45,6 +45,11 @@ class BranchListSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        representation = super(ActionSerializer, self).to_representation(instance)
+        representation["created"] = instance.created.strftime("%Y-%m-%d %H:%M:%S")
+        return representation
+
     class Meta:
         fields = (
             "user_friendly_id",
@@ -52,6 +57,7 @@ class ActionSerializer(serializers.ModelSerializer):
             "type",
             "reference_type",
             "reference",
+            "created",
         )
         model = Action
 
