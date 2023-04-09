@@ -30,9 +30,10 @@ class BranchList(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = [
         "ifsc",
+        "address__city",
+        "address__pin_code",
     ]
     queryset = Branch.objects.all()
-
 
 class LastTenActionList(APIView):
     permission_classes = (IsAuthorOrReadOnly,)
